@@ -561,6 +561,9 @@ socket.on('setDistrict', (districtName) => {
     currentDistrict = districtName;
     console.log("Joined district:", districtName);
 
+    // Play Music
+    playDistrictMusic(districtName);
+
     // Reset all movement keys to prevent sticking
     Object.keys(keys).forEach(k => keys[k] = false);
 
@@ -638,8 +641,11 @@ renderer.canvas.addEventListener('mousedown', (e) => {
     if (!isEditing) return;
 
     const rect = renderer.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const offset = renderer.getOffset();
+
+    // Adjust mouse coordinates by removing the centering offset
+    const x = e.clientX - rect.left - offset.x;
+    const y = e.clientY - rect.top - offset.y;
 
     // Find house containing our Player (Simplification: Check mouse pos vs House pos)
     let targetHouseId = null;
@@ -667,18 +673,7 @@ renderer.canvas.addEventListener('mousedown', (e) => {
     }
 });
 
-window.addEventListener('keyup', (e) => {
-    if (!e.key) return; // Safety check
-    if (e.key.toLowerCase() === 'e') {
-        keys.e = false;
-    }
-    if (e.key === ' ') {
-        keys.space = false;
-    }
-    if (keys.hasOwnProperty(e.key)) {
-        keys[e.key] = false;
-    }
-});
+// ... keyup listeners ...
 
 function handleHouseInteraction(house) {
     if (!house.owner) {
@@ -710,18 +705,17 @@ document.getElementById('ui-layer').appendChild(promptDiv);
 function showInteractionPrompt(house) {
     promptDiv.style.display = 'block';
     // Position above house
-    // Translate game coords to screen coords (1:1 for now)
-    promptDiv.style.left = house.x + 'px';
-    promptDiv.style.top = (house.y - 20) + 'px';
+    // Translate game coords to screen coords (Need to add offset back!)
+    const offset = renderer.getOffset();
+
+    promptDiv.style.left = (house.x + offset.x) + 'px';
+    promptDiv.style.top = (house.y - 20 + offset.y) + 'px';
 
     if (!house.owner) {
         promptDiv.textContent = `[E] Buy ${house.id} (${house.price} coins)`;
     } else {
         promptDiv.textContent = `[E] Enter ${house.owner}'s House`;
     }
-
-    // Clear prompt in next frame if not close (handled by loop clearing or hiding)
-    // Actually, simplest is to Hide it by default each frame, and Show if close.
 }
 
 // Collision Detection Helper
@@ -807,6 +801,53 @@ function update() {
     }
 }
 
+// --- AUDIO SYSTEM ---
+const AUDIO_FILES = {
+    'plaza': './public/audio/Plaza.mp3',
+    'housing': './public/audio/Houses.mp3',
+    'arena': './public/audio/Arena.mp3',
+    'school': './public/audio/School.mp3'
+};
+const audioElements = {};
+let currentAudio = null;
+
+// Preload audio objects
+Object.keys(AUDIO_FILES).forEach(key => {
+    const audio = new Audio(AUDIO_FILES[key]);
+    audio.loop = true;
+    audio.volume = 0.5;
+    audioElements[key] = audio;
+});
+
+function playDistrictMusic(districtName) {
+    // Stop current
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+
+    // Play new
+    // Note: Browsers block autoplay. This might fail until user interacts.
+    // We swallow errors to prevent console spam.
+    const newAudio = audioElements[districtName];
+    if (newAudio) {
+        currentAudio = newAudio;
+        newAudio.play().catch(e => console.log("Audio autoplay blocked, waiting for interaction"));
+    }
+}
+
+// Ensure audio starts on first click if blocked
+window.addEventListener('click', () => {
+    if (currentAudio && currentAudio.paused) {
+        currentAudio.play().catch(e => { });
+    }
+}, { once: true });
+
+
+// --- TRANSITION LOGIC ---
+let isTransitioning = false;
+let transitionTimer = null;
+
 // Map Topology: [Current] -> [Direction] -> [Target]
 const DISTRICT_MAP = {
     'plaza': { left: 'housing', right: 'arena', top: 'school' },
@@ -816,9 +857,11 @@ const DISTRICT_MAP = {
 };
 
 function checkDistrictBoundaries(player) {
+    if (isTransitioning) return; // Block checks during transition cooldown
+
     const W = 800; // World Width
     const H = 600; // World Height
-    const OFFSET = 50; // Spawn offset from edge
+    const OFFSET = 75; // Safe spawn offset (increased from 50 to prevent immediate re-trigger)
 
     let target = null;
     let spawn = null;
@@ -841,9 +884,22 @@ function checkDistrictBoundaries(player) {
         // Stop movement to prevent bouncing
         keys.w = keys.a = keys.s = keys.d = false;
 
+        // Set Transition Flag
+        isTransitioning = true;
+
         socket.emit('joinDistrict', target, spawn);
         currentDistrict = target;
         console.log(`Traveling to ${target} at`, spawn);
+
+        // Play Music
+        playDistrictMusic(target);
+
+        // Clear Transition Flag after cooldown (500ms)
+        if (transitionTimer) clearTimeout(transitionTimer);
+        transitionTimer = setTimeout(() => {
+            isTransitioning = false;
+        }, 500);
+
     } else {
         // Limit to bounds if no exit
         if (player.x < 0) player.x = 0;

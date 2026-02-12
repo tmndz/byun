@@ -2,32 +2,72 @@ export class Renderer {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
+        this.offsetX = 0;
+        this.offsetY = 0;
         this.resize();
         window.addEventListener('resize', () => this.resize());
+
+        // Asset Loading (Placeholders for now)
+        this.sprites = {
+            player: new Image(),
+            ground: new Image(),
+            wall: new Image()
+        };
+        // Attempt to load - validation happens in draw
+        this.sprites.player.src = './public/sprites/player.png';
+        this.sprites.ground.src = './public/sprites/ground.png';
+        this.sprites.wall.src = './public/sprites/wall.png';
     }
 
     resize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+
+        // Calculate centering offset for 800x600 game world
+        this.offsetX = (this.canvas.width - 800) / 2;
+        this.offsetY = (this.canvas.height - 600) / 2;
+    }
+
+    getOffset() {
+        return { x: this.offsetX, y: this.offsetY };
     }
 
     clear() {
-        this.ctx.fillStyle = '#222';
+        // Clear entire screen
+        this.ctx.fillStyle = '#1a1a1a'; // Dark background for outside game area
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw Game Area Background (The 800x600 box)
+        this.ctx.fillStyle = '#222';
+        this.ctx.fillRect(this.offsetX, this.offsetY, 800, 600);
+
+        // Clip to game area to prevent drawing outside
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.rect(this.offsetX, this.offsetY, 800, 600);
+        this.ctx.clip();
+
+        // Translate context so (0,0) is at top-left of game area
+        this.ctx.translate(this.offsetX, this.offsetY);
     }
 
     drawPlayers(players) {
         Object.values(players).forEach(player => {
-            // Override color for team mode
-            let displayColor = player.color;
-            if (player.team === 'red') displayColor = '#ff0000';
-            if (player.team === 'blue') displayColor = '#0000ff';
+            // Draw Player Sprite if loaded, else Circle
+            if (this.sprites.player.complete && this.sprites.player.naturalHeight !== 0) {
+                this.ctx.drawImage(this.sprites.player, player.x - 15, player.y - 15, 30, 30);
+            } else {
+                // Fallback Circle
+                let displayColor = player.color;
+                if (player.team === 'red') displayColor = '#ff0000';
+                if (player.team === 'blue') displayColor = '#0000ff';
 
-            this.ctx.beginPath();
-            this.ctx.arc(player.x, player.y, 15, 0, Math.PI * 2);
-            this.ctx.fillStyle = displayColor;
-            this.ctx.fill();
-            this.ctx.closePath();
+                this.ctx.beginPath();
+                this.ctx.arc(player.x, player.y, 15, 0, Math.PI * 2);
+                this.ctx.fillStyle = displayColor;
+                this.ctx.fill();
+                this.ctx.closePath();
+            }
 
             // Draw simple name/label
             this.ctx.fillStyle = 'white';
@@ -125,31 +165,27 @@ export class Renderer {
         this.ctx.strokeStyle = '#777';
         this.ctx.lineWidth = 2;
 
+        const drawWall = (x, y, w, h) => {
+            if (this.sprites.wall.complete && this.sprites.wall.naturalHeight !== 0) {
+                this.ctx.drawImage(this.sprites.wall, x, y, w, h);
+            } else {
+                this.ctx.fillRect(x, y, w, h);
+                this.ctx.strokeRect(x, y, w, h);
+            }
+        };
+
         // Top-left
-        this.ctx.fillRect(200, 150, 80, 80);
-        this.ctx.strokeRect(200, 150, 80, 80);
-
+        drawWall(200, 150, 80, 80);
         // Top-right
-        this.ctx.fillRect(520, 150, 80, 80);
-        this.ctx.strokeRect(520, 150, 80, 80);
-
+        drawWall(520, 150, 80, 80);
         // Bottom-left
-        this.ctx.fillRect(200, 370, 80, 80);
-        this.ctx.strokeRect(200, 370, 80, 80);
-
+        drawWall(200, 370, 80, 80);
         // Bottom-right
-        this.ctx.fillRect(520, 370, 80, 80);
-        this.ctx.strokeRect(520, 370, 80, 80);
-
+        drawWall(520, 370, 80, 80);
         // Center obstacle (darker)
         this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(260, 260, 80, 80);
-        this.ctx.strokeRect(260, 260, 80, 80);
-
-        // Center obstacle (darker)
-        this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(460, 260, 80, 80);
-        this.ctx.strokeRect(460, 260, 80, 80);
+        drawWall(260, 260, 80, 80);
+        drawWall(460, 260, 80, 80);
 
         // Border warning
         this.ctx.strokeStyle = '#ff0000';
@@ -158,7 +194,13 @@ export class Renderer {
     }
 
     drawGame(players, houses = {}, currentDistrict = 'plaza') {
-        this.clear();
+        this.clear(); // This now sets up the transform and clip
+
+        // Draw Ground Texture if available
+        if (this.sprites.ground.complete && this.sprites.ground.naturalHeight !== 0) {
+            // Draw tiled? For now just stretch or simple fill
+            this.ctx.drawImage(this.sprites.ground, 0, 0, 800, 600);
+        }
 
         if (currentDistrict === 'housing') {
             this.drawHouses(houses);
@@ -171,5 +213,8 @@ export class Renderer {
         }
 
         this.drawPlayers(players);
+
+        // Restore context to remove clip/transform for next frame (though we clear next frame anyway)
+        this.ctx.restore();
     }
 }
