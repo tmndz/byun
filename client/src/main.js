@@ -39,7 +39,9 @@ const keys = {
     ArrowUp: false,
     ArrowLeft: false,
     ArrowDown: false,
-    ArrowRight: false
+    ArrowRight: false,
+    e: false,
+    space: false
 };
 
 // Socket Events
@@ -585,27 +587,27 @@ window.addEventListener('keydown', (e) => {
     // If typing in chat, ignore game controls
     if (document.activeElement === chatInput) return;
 
-    if (!e.key) return; // Safety check
+    const key = e.key.toLowerCase();
 
-    // Toggle E
-    if (e.key.toLowerCase() === 'e') {
-        if (!keys.e) {
-            keys.e = true;
-        }
-    }
+    // Movement Keys (WASD + Arrows)
+    if (key === 'w' || e.key === 'ArrowUp') keys.w = keys.ArrowUp = true;
+    if (key === 'a' || e.key === 'ArrowLeft') keys.a = keys.ArrowLeft = true;
+    if (key === 's' || e.key === 'ArrowDown') keys.s = keys.ArrowDown = true;
+    if (key === 'd' || e.key === 'ArrowRight') keys.d = keys.ArrowRight = true;
 
-    // Space for attack
-    if (e.key === ' ') {
-        keys.space = true;
-    }
+    // Actions
+    if (key === 'e') keys.e = true;
+    if (e.key === ' ') keys.space = true;
 
     // Toggle Editor 'b'
-    if (e.key.toLowerCase() === 'b') {
-        toggleEditor();
-    }
+    if (key === 'b') toggleEditor();
 
-    if (keys.hasOwnProperty(e.key)) {
-        keys[e.key] = true;
+    // Opening/Closing Map (M)
+    if (key === 'm') {
+        const mapModal = document.getElementById('map-modal');
+        if (mapModal) {
+            mapModal.style.display = mapModal.style.display === 'block' ? 'none' : 'block';
+        }
     }
 });
 
@@ -673,8 +675,23 @@ renderer.canvas.addEventListener('mousedown', (e) => {
     }
 });
 
-// ... keyup listeners ...
+// Key release listeners
+window.addEventListener('keyup', (e) => {
+    const key = e.key.toLowerCase();
 
+    if (key === 'w' || e.key === 'ArrowUp') keys.w = keys.ArrowUp = false;
+    if (key === 'a' || e.key === 'ArrowLeft') keys.a = keys.ArrowLeft = false;
+    if (key === 's' || e.key === 'ArrowDown') keys.s = keys.ArrowDown = false;
+    if (key === 'd' || e.key === 'ArrowRight') keys.d = keys.ArrowRight = false;
+
+    if (key === 'e') keys.e = false;
+    if (e.key === ' ') keys.space = false;
+});
+
+// Reset keys when window loses focus to prevent sticking
+window.addEventListener('blur', () => {
+    Object.keys(keys).forEach(k => keys[k] = false);
+});
 function handleHouseInteraction(house) {
     if (!house.owner) {
         // Buy?
