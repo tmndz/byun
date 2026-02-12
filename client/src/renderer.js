@@ -17,9 +17,12 @@ export class Renderer {
         // Use absolute paths for assets in public folder
         const assetBase = '/sprites/';
 
-        this.sprites.player.src = `${assetBase}player.png`;
+        this.sprites.player.src = `${assetBase}player_sheet.png`;
         this.sprites.ground.src = `${assetBase}ground.png`;
         this.sprites.wall.src = `${assetBase}wall.png`;
+
+        // Animation State Tracker
+        this.playerAnimationStates = {};
 
         // Debug loading
         Object.keys(this.sprites).forEach(key => {
@@ -61,10 +64,68 @@ export class Renderer {
     }
 
     drawPlayers(players) {
+        const now = Date.now();
+
         Object.values(players).forEach(player => {
+            // Animation State Management
+            if (!this.playerAnimationStates[player.playerId]) {
+                this.playerAnimationStates[player.playerId] = {
+                    frame: 0,
+                    direction: 0, // 0: Down, 1: Left, 2: Right, 3: Up
+                    lastX: player.x,
+                    lastY: player.y,
+                    lastUpdate: now,
+                    isMoving: false
+                };
+            }
+
+            const animState = this.playerAnimationStates[player.playerId];
+
+            // Calculate Movement Delta
+            const dx = player.x - animState.lastX;
+            const dy = player.y - animState.lastY;
+            const moved = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
+
+            if (moved) {
+                animState.isMoving = true;
+                // Update Direction
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    animState.direction = dx > 0 ? 2 : 1; // Right : Left
+                } else {
+                    animState.direction = dy > 0 ? 0 : 3; // Down : Up
+                }
+
+                // Update Frame
+                if (now - animState.lastUpdate > 150) { // 150ms per frame
+                    animState.frame = (animState.frame + 1) % 4;
+                    animState.lastUpdate = now;
+                }
+            } else {
+                animState.isMoving = false;
+                animState.frame = 0; // Idle frame
+            }
+
+            // Update last position for next frame
+            animState.lastX = player.x;
+            animState.lastY = player.y;
+
+
             // Draw Player Sprite if loaded, else Circle
             if (this.sprites.player.complete && this.sprites.player.naturalHeight !== 0) {
-                this.ctx.drawImage(this.sprites.player, player.x - 15, player.y - 15, 30, 30);
+                const sprite = this.sprites.player;
+                const frameWidth = sprite.width / 4;
+                const frameHeight = sprite.height / 4;
+
+                // Row order: Down (0), Left (1), Right (2), Up (3)
+                // Use gathered direction directly
+                const row = animState.direction;
+                const col = animState.frame;
+
+                this.ctx.drawImage(
+                    sprite,
+                    col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
+                    player.x - 20, player.y - 30, 40, 40 // Destination (slightly larger than hit box)
+                );
             } else {
                 // Fallback Circle
                 let displayColor = player.color;
@@ -82,7 +143,7 @@ export class Renderer {
             this.ctx.fillStyle = 'white';
             this.ctx.font = '12px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText(player.playerId.substr(0, 4), player.x, player.y - 20);
+            this.ctx.fillText(player.playerId.substr(0, 4), player.x, player.y - 35); // Moved label up slightly
 
             // Draw HP bar if in battle
             if (player.hp !== undefined) {
@@ -92,11 +153,11 @@ export class Renderer {
 
                 // Background
                 this.ctx.fillStyle = '#333';
-                this.ctx.fillRect(player.x - barWidth / 2, player.y - 35, barWidth, barHeight);
+                this.ctx.fillRect(player.x - barWidth / 2, player.y - 45, barWidth, barHeight);
 
                 // HP
                 this.ctx.fillStyle = hpPercent > 0.5 ? '#00ff00' : hpPercent > 0.25 ? '#ffaa00' : '#ff0000';
-                this.ctx.fillRect(player.x - barWidth / 2, player.y - 35, barWidth * hpPercent, barHeight);
+                this.ctx.fillRect(player.x - barWidth / 2, player.y - 45, barWidth * hpPercent, barHeight);
             }
         });
     }
