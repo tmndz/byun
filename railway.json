@@ -6,5 +6,17 @@
         "startCommand": "npm start",
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 10
+    },
+    "nixpacks": {
+        "install": {
+            "cmds": [
+                "npm install"
+            ]
+        },
+        "setup": {
+            "nixPkgs": [
+                "nodejs_20"
+            ]
+        }
     }
 }
