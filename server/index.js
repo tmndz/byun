@@ -20,26 +20,24 @@ const io = new Server(httpServer, {
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // Persistence Setup
-const DEFAULT_DATA_DIR = path.join(__dirname, 'data');
-const DATA_DIR = process.env.DATA_DIR || DEFAULT_DATA_DIR;
+const INITIAL_DATA_DIR = path.join(__dirname, 'initial_data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
 // Ensure DATA_DIR exists
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// If using a volume (DATA_DIR != DEFAULT_DATA_DIR), copy defaults if target files are missing
-if (DATA_DIR !== DEFAULT_DATA_DIR) {
-    ['users.json', 'houses.json', 'items.json'].forEach(fileName => {
-        const sourcePath = path.join(DEFAULT_DATA_DIR, fileName);
-        const targetPath = path.join(DATA_DIR, fileName);
+// Copy defaults if target files are missing
+['users.json', 'houses.json', 'items.json'].forEach(fileName => {
+    const sourcePath = path.join(INITIAL_DATA_DIR, fileName);
+    const targetPath = path.join(DATA_DIR, fileName);
 
-        if (!fs.existsSync(targetPath) && fs.existsSync(sourcePath)) {
-            console.log(`Copying default ${fileName} to persistent volume...`);
-            fs.copyFileSync(sourcePath, targetPath);
-        }
-    });
-}
+    if (!fs.existsSync(targetPath) && fs.existsSync(sourcePath)) {
+        console.log(`Initializing ${fileName} in data directory...`);
+        fs.copyFileSync(sourcePath, targetPath);
+    }
+});
 
 const DATA_FILE = path.join(DATA_DIR, 'users.json');
 const HOUSES_FILE = path.join(DATA_DIR, 'houses.json');

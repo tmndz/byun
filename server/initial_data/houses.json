@@ -1,0 +1,54 @@
+{
+  "plot_1": {
+    "id": "plot_1",
+    "x": 350,
+    "y": 200,
+    "price": 500,
+    "owner": null,
+    "furniture": []
+  },
+  "plot_2": {
+    "id": "plot_2",
+    "x": 500,
+    "y": 200,
+    "price": 500,
+    "owner": "Tmndz",
+    "furniture": [
+      {
+        "type": "table",
+        "color": "#DEB887",
+        "x": 525,
+        "y": 217
+      }
+    ]
+  },
+  "plot_3": {
+    "id": "plot_3",
+    "x": 650,
+    "y": 200,
+    "price": 500,
+    "owner": "Tmndz",
+    "furniture": [
+      {
+        "type": "crate",
+        "color": "#8B4513",
+        "x": 680,
+        "y": 221
+      },
+      {
+        "type": "crate",
+        "color": "#8B4513",
+        "x": 654,
+        "y": 184
+      }
+    ]
+  },
+  "plot_4": {
+    "id": "plot_4",
+    "x": 800,
+    "y": 200,
+    "price": 500,
+    "owner": null,
+    "furniture": []
+  }
+}
