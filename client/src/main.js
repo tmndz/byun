@@ -804,7 +804,7 @@ function update() {
 // --- AUDIO SYSTEM ---
 const AUDIO_FILES = {
     'plaza': '/audio/Plaza.mp3',
-    'housing': '/audio/Houses.mp3',
+    'housing': '/audio/Housing.mp3',
     'arena': '/audio/Arena.mp3',
     'school': '/audio/School.mp3'
 };
@@ -886,6 +886,11 @@ function checkDistrictBoundaries(player) {
 
         // Set Transition Flag
         isTransitioning = true;
+
+        // IMMEDIATE CLIENT-SIDE SNAP: Move player to safe spawn to prevent double-trigger
+        // after the cooldown expires.
+        player.x = spawn.x;
+        player.y = spawn.y;
 
         socket.emit('joinDistrict', target, spawn);
         currentDistrict = target;
