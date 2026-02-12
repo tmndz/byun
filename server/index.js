@@ -20,9 +20,14 @@ const io = new Server(httpServer, {
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // Persistence Setup
-const DATA_FILE = path.join(__dirname, 'data', 'users.json');
-const HOUSES_FILE = path.join(__dirname, 'data', 'houses.json');
-const ITEMS_FILE = path.join(__dirname, 'data', 'items.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+const DATA_FILE = path.join(DATA_DIR, 'users.json');
+const HOUSES_FILE = path.join(DATA_DIR, 'houses.json');
+const ITEMS_FILE = path.join(DATA_DIR, 'items.json');
 
 // Helper to load/save
 function loadData(file) {
