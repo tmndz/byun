@@ -269,7 +269,8 @@ const closeShopBtn = document.getElementById('close-shop-btn');
 // Items will be loaded from server
 let SHOP_ITEMS = [
     { id: 'sword', name: 'Iron Sword', price: 100, desc: "Melee Damage", range: 50 },
-    { id: 'gun', name: 'Blaster', price: 250, desc: "Ranged Damage", range: 400 }
+    { id: 'gun', name: 'Blaster', price: 250, desc: "Ranged Damage", range: 400 },
+    { id: 'hp', name: 'Healer', price: 300, desc: "Heal Short Range", range: 25 }
 ];
 
 function openShop() {
