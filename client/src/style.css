@@ -1,0 +1,493 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  background-color: #1a1a1a;
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  display: block;
+}
+
+#ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Make UI elements interactable */
+#ui-layer>* {
+  pointer-events: auto;
+}
+
+#instructions {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  pointer-events: none;
+  /* Just a label */
+}
+
+/* District Controls */
+#district-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#open-map-btn {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 25px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#open-map-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Map Modal */
+#map-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  backdrop-filter: blur(5px);
+}
+
+.map-content {
+  background: #222;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid #444;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.map-content h2 {
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-areas:
+    "school arena"
+    "plaza housing";
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.map-node {
+  background: #333;
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.map-node:hover {
+  background: #444;
+  border-color: #6e8efb;
+  transform: translateY(-2px);
+}
+
+#close-map-btn {
+  background: transparent;
+  border: 1px solid #666;
+  color: #aaa;
+  padding: 8px 20px;
+}
+
+#close-map-btn:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+/* Chat System */
+#chat-container {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#chat-messages {
+  height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  mask-image: linear-gradient(to bottom, transparent, black 20%);
+}
+
+.message {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.message-id {
+  font-weight: bold;
+  font-size: 11px;
+  opacity: 0.8;
+  margin-right: 5px;
+}
+
+#chat-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 4px;
+  color: white;
+  font-family: inherit;
+  outline: none;
+}
+
+#chat-input:focus {
+  border-color: #666;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login Overlay */
+#login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.login-box {
+  background: #2a2a2a;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.login-box h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #666;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+#login-btn {
+  background: #007bff;
+  color: white;
+}
+
+/* Quiz Modal */
+#quiz-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  backdrop-filter: blur(5px);
+}
+
+.quiz-content {
+  background: #2d4d2d;
+  /* Chalkboard green */
+  padding: 40px;
+  border: 8px solid #8B4513;
+  /* Wood frame */
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  width: 300px;
+}
+
+.quiz-content h2 {
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#quiz-question {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+#quiz-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid white;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  width: 100px;
+  font-family: 'Courier New', monospace;
+}
+
+#quiz-feedback {
+  min-height: 20px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#register-btn {
+  background: #444;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+#auth-error {
+  color: #ff4444;
+  margin-top: 15px;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+/* Stats Display */
+#stats-display {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: monospace;
+  font-size: 14px;
+  border-left: 2px solid #00ff00;
+}
+
+/* Editor Toolbar */
+#editor-toolbar {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  z-index: 50;
+  display: none;
+  /* Hidden by default */
+}
+
+.editor-item {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #555;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: #aaa;
+}
+
+.editor-item.selected {
+  border-color: #00ff00;
+  background: #2a442a;
+}
+
+/* Shop Modal */
+#shop-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  backdrop-filter: blur(5px);
+}
+
+.shop-content {
+  background: #444;
+  padding: 30px;
+  border: 4px solid #888;
+  border-radius: 8px;
+  text-align: center;
+  width: 400px;
+  color: white;
+}
+
+.shop-item {
+  background: #222;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #555;
+  transition: background 0.2s;
+}
+
+.shop-item:hover {
+  background: #333;
+  border-color: #aaa;
+}
+
+.shop-item button {
+  background: #ffaa00;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #000;
+  font-weight: bold;
+}
+
+.shop-item button:hover {
+  background: #ffcc00;
+}
+
+/* Battle Modal */
+#battle-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.battle-content {
+  background: linear-gradient(135deg, #2a0a0a 0%, #4a1a1a 100%);
+  padding: 40px;
+  border: 4px solid #ff4444;
+  border-radius: 12px;
+  text-align: center;
+  width: 400px;
+  color: white;
+  box-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
+}
+
+.battle-options label {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.battle-options label:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.battle-options input[type="radio"] {
+  margin-right: 10px;
+}

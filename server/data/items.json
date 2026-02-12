@@ -1,0 +1,22 @@
+[
+    {
+        "id": "sword",
+        "name": "Iron Sword",
+        "type": "melee",
+        "damage": 100,
+        "range": 100,
+        "cooldown": 300,
+        "price": 100,
+        "color": "#C0C0C0"
+    },
+    {
+        "id": "gun",
+        "name": "Blaster",
+        "type": "ranged",
+        "damage": 15,
+        "range": 400,
+        "cooldown": 800,
+        "price": 250,
+        "color": "#FF4500"
+    }
+]

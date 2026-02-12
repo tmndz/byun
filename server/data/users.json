@@ -1,0 +1,41 @@
+{
+  "Tmndz": {
+    "password": "4-1",
+    "username": "Tmndz",
+    "x": 590,
+    "y": 285,
+    "district": "arena_battle",
+    "color": "hsl(240.06481564182172, 70%, 50%)",
+    "money": 1003250,
+    "equipment": "gun"
+  },
+  "persistent_user": {
+    "password": "persistent_pass",
+    "username": "persistent_user",
+    "x": 400,
+    "y": 300,
+    "district": "arena",
+    "color": "hsl(240.355136689904, 70%, 50%)",
+    "money": 1000
+  },
+  "Tmndz-2": {
+    "password": "4-1",
+    "username": "Tmndz-2",
+    "x": 545,
+    "y": 250,
+    "district": "arena",
+    "color": "hsl(125.97333483965986, 70%, 50%)",
+    "money": 1470,
+    "equipment": "gun"
+  },
+  "T": {
+    "password": "4-1",
+    "username": "T",
+    "x": 395,
+    "y": 160,
+    "district": "arena_battle",
+    "color": "hsl(51.880798748516355, 70%, 50%)",
+    "money": 12610,
+    "equipment": "sword"
+  }
+}
