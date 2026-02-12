@@ -1,22 +1,31 @@
 {
-    "build": {
-        "builder": "NIXPACKS"
-    },
-    "deploy": {
-        "startCommand": "npm start",
-        "restartPolicyType": "ON_FAILURE",
-        "restartPolicyMaxRetries": 10
-    },
-    "nixpacks": {
-        "install": {
-            "cmds": [
-                "npm install"
-            ]
-        },
-        "setup": {
-            "nixPkgs": [
-                "nodejs_22.12"
-            ]
-        }
-    }
+  "name": "byun",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "concurrently \"nodemon server/index.js\" \"vite\"",
+    "build": "vite build",
+    "server": "nodemon server/index.js",
+    "client": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "vite": "^7.3.1"
+  },
+  "engines": {
+    "node": "22.x"
+  }
 }
