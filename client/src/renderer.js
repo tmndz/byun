@@ -13,10 +13,19 @@ export class Renderer {
             ground: new Image(),
             wall: new Image()
         };
-        // Attempt to load - validation happens in draw
-        this.sprites.player.src = './public/sprites/player.png';
-        this.sprites.ground.src = './public/sprites/ground.png';
-        this.sprites.wall.src = './public/sprites/wall.png';
+
+        // Use absolute paths for assets in public folder
+        const assetBase = '/sprites/';
+
+        this.sprites.player.src = `${assetBase}player.png`;
+        this.sprites.ground.src = `${assetBase}ground.png`;
+        this.sprites.wall.src = `${assetBase}wall.png`;
+
+        // Debug loading
+        Object.keys(this.sprites).forEach(key => {
+            this.sprites[key].onload = () => console.log(`Loaded sprite: ${key}`);
+            this.sprites[key].onerror = () => console.error(`Failed to load sprite: ${key}`);
+        });
     }
 
     resize() {

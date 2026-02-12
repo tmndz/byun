@@ -803,10 +803,10 @@ function update() {
 
 // --- AUDIO SYSTEM ---
 const AUDIO_FILES = {
-    'plaza': './public/audio/Plaza.mp3',
-    'housing': './public/audio/Houses.mp3',
-    'arena': './public/audio/Arena.mp3',
-    'school': './public/audio/School.mp3'
+    'plaza': '/audio/Plaza.mp3',
+    'housing': '/audio/Houses.mp3',
+    'arena': '/audio/Arena.mp3',
+    'school': '/audio/School.mp3'
 };
 const audioElements = {};
 let currentAudio = null;

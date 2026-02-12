@@ -10,7 +10,9 @@ export default defineConfig({
             }
         }
     },
+    publicDir: 'public',
     build: {
-        outDir: '../dist'
+        outDir: '../dist',
+        emptyOutDir: true
     }
 });

@@ -163,6 +163,9 @@ initDB().then(() => {
                 // Check if it's a house
                 if (!newDistrict.startsWith('house_')) return;
             }
+            if (spawnPos && (typeof spawnPos.x !== 'number' || typeof spawnPos.y !== 'number')) {
+                spawnPos = null; // Sanitize
+            }
             handleDistrictChange(socket, newDistrict, spawnPos);
         });
 
