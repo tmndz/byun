@@ -9,15 +9,6 @@
     "money": 1003250,
     "equipment": "gun"
   },
-  "persistent_user": {
-    "password": "persistent_pass",
-    "username": "persistent_user",
-    "x": 400,
-    "y": 300,
-    "district": "arena",
-    "color": "hsl(240.355136689904, 70%, 50%)",
-    "money": 1000
-  },
   "Tmndz-2": {
     "password": "4-1",
     "username": "Tmndz-2",
