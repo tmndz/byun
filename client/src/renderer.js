@@ -114,18 +114,46 @@ export class Renderer {
             if (this.sprites.player.complete && this.sprites.player.naturalHeight !== 0) {
                 const sprite = this.sprites.player;
                 const frameWidth = sprite.width / 4;
-                const frameHeight = sprite.height / 4;
+                const frameHeight = sprite.height / 3; // 3 rows now: Down, Side, Up
 
-                // Row order: Down (0), Left (1), Right (2), Up (3)
-                // Use gathered direction directly
-                const row = animState.direction;
+                // animState.direction mappings (from main.js): 0: Down, 1: Left, 2: Right, 3: Up
+                // Sprite Sheet Row mappings: 0: Down, 1: Side, 2: Up
+                let row = 0;
+                let flipX = false;
+
+                if (animState.direction === 1) { // Left
+                    row = 1; // Use side row
+                    flipX = true;
+                } else if (animState.direction === 2) { // Right
+                    row = 1; // Use side row
+                } else if (animState.direction === 3) { // Up
+                    row = 2;
+                } else { // Down (0)
+                    row = 0;
+                }
+
                 const col = animState.frame;
 
-                this.ctx.drawImage(
-                    sprite,
-                    col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
-                    player.x - 20, player.y - 30, 40, 40 // Destination (slightly larger than hit box)
-                );
+                this.ctx.save();
+
+                if (flipX) {
+                    // To flip, we move to the center of the character, scale, and draw relative
+                    this.ctx.translate(player.x, player.y);
+                    this.ctx.scale(-1, 1);
+                    this.ctx.drawImage(
+                        sprite,
+                        col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
+                        -20, -30, 40, 40 // Destination (relative to flipped axis)
+                    );
+                } else {
+                    this.ctx.drawImage(
+                        sprite,
+                        col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
+                        player.x - 20, player.y - 30, 40, 40 // Destination
+                    );
+                }
+
+                this.ctx.restore();
             } else {
                 // Fallback Circle
                 let displayColor = player.color;
