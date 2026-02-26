@@ -278,6 +278,50 @@ export class Renderer {
         this.ctx.fillText("BATTLE GATE", 650, 90);
     }
 
+    drawBrawlStarsDistrict() {
+        // Ground - Purple/Neon
+        this.ctx.fillStyle = '#1a0033';
+        this.ctx.fillRect(0, 0, 800, 600);
+
+        // Neon Grid
+        this.ctx.strokeStyle = '#ff00ff';
+        this.ctx.lineWidth = 1;
+        this.ctx.globalAlpha = 0.3;
+        for (let i = 0; i <= 800; i += 40) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(i, 0);
+            this.ctx.lineTo(i, 600);
+            this.ctx.stroke();
+        }
+        for (let i = 0; i <= 600; i += 40) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, i);
+            this.ctx.lineTo(800, i);
+            this.ctx.stroke();
+        }
+        this.ctx.globalAlpha = 1.0;
+
+        // Big Portal in Center
+        const cx = 400, cy = 300;
+        const grad = this.ctx.createRadialGradient(cx, cy, 50, cx, cy, 150);
+        grad.addColorStop(0, '#00ffff');
+        grad.addColorStop(0.5, '#ff00ff');
+        grad.addColorStop(1, 'transparent');
+
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Portal Icon
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = 'bold 30px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText("BRAWL PORTAL", cx, cy - 20);
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText("Touch to jump to Rip off Brawl stars", cx, cy + 20);
+    }
+
 
 
     drawBattleZone() {
@@ -331,6 +375,8 @@ export class Renderer {
             this.drawArena();
         } else if (currentDistrict === 'arena_battle') {
             this.drawBattleZone();
+        } else if (currentDistrict === 'brawl_stars') {
+            this.drawBrawlStarsDistrict();
         }
 
         this.drawPlayers(players);
