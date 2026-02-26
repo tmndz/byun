@@ -516,12 +516,12 @@ function checkInteractions() {
             promptDiv.style.display = 'block';
             promptDiv.style.left = cx + 'px';
             promptDiv.style.top = (cy - 120) + 'px';
-            promptDiv.textContent = "[E] ENTER BATTLE (DEATHMATCH)";
+            promptDiv.textContent = "[E] ENTER NEON WAR ARENA";
 
             if (keys.e) {
                 keys.e = false;
-                // Instead of broken redirect, join Deathmatch battle
-                socket.emit('joinBattle', { mode: 'solo', team: null });
+                // Redirect to the cloned game on Vite port 5174
+                window.location.href = `http://${window.location.hostname}:5174`;
             }
         }
     }
