@@ -522,6 +522,30 @@ function checkInteractions() {
             }
         }
     }
+
+    // 4. Brawl Stars District Interactions
+    if (currentDistrict === 'brawl_stars') {
+        const me = players[myId];
+        if (!me) return;
+
+        const cx = 400, cy = 300;
+        const dist = Math.sqrt((me.x - cx) ** 2 + (me.y - cy) ** 2);
+
+        if (dist < 100) {
+            promptDiv.style.display = 'block';
+            promptDiv.style.left = cx + 'px';
+            promptDiv.style.top = (cy - 120) + 'px';
+            promptDiv.textContent = "[E] ENTER NEON WAR ARENA";
+
+            if (keys.e) {
+                keys.e = false;
+                // Redirect to the other game (assuming it runs on 3001 or same host/other path)
+                // Since this is a local environment, I'll use 3001 as a guess or just same host next port
+                const brawlPort = 3001;
+                window.location.href = `http://${window.location.hostname}:${brawlPort}`;
+            }
+        }
+    }
 }
 
 // Battle Zone Attack Logic
