@@ -60,7 +60,7 @@ async function initDB() {
 // Global variables for active state (Syncing from DB)
 const players = {};
 const socketUserMap = {};
-const DISTRICTS = ['plaza', 'housing', 'arena', 'school', 'arena_battle', 'brawl_stars'];
+const DISTRICTS = ['plaza', 'housing', 'arena', 'school', 'arena_battle'];
 
 initDB().then(() => {
     io.on('connection', (socket) => {

@@ -47,7 +47,6 @@
             <div class="map-node" data-target="arena" style="grid-area: arena;">⚔️ Arena</div>
             <div class="map-node" data-target="plaza" style="grid-area: plaza;">🏙️ Plaza City</div>
             <div class="map-node" data-target="housing" style="grid-area: housing;">🏡 Residential</div>
-            <div class="map-node" data-target="brawl_stars" style="grid-area: brawl;">⭐️ Brawl Stars</div>
           </div>
           <button id="close-map-btn">Cancel</button>
         </div>
@@ -84,18 +83,11 @@
         <div class="battle-content">
           <h2>Enter Battle Arena ⚔️</h2>
           <div class="battle-options">
-            <h3>Game Mode</h3>
-            <label><input type="radio" name="mode" value="solo" checked> Solo (FFA)</label>
-            <label><input type="radio" name="mode" value="team"> Team Battle</label>
-
-            <div id="team-selection" style="display: none; margin-top: 20px;">
-              <h3>Choose Team</h3>
-              <label><input type="radio" name="team" value="red" checked> 🔴 Red Team</label>
-              <label><input type="radio" name="team" value="blue"> 🔵 Blue Team</label>
-            </div>
+            <h3 style="margin-bottom: 20px;">MODE: DEATHMATCH</h3>
+            <input type="hidden" name="mode" value="solo">
           </div>
           <div class="button-group" style="margin-top: 20px;">
-            <button id="enter-battle-btn">Enter Battle</button>
+            <button id="enter-battle-btn">Enter Deathmatch</button>
             <button id="close-battle-btn">Cancel</button>
           </div>
         </div>
