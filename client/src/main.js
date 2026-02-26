@@ -225,6 +225,11 @@ mapNodes.forEach(node => {
     node.addEventListener('click', () => {
         const target = node.getAttribute('data-target');
         if (target) {
+            if (target === 'brawl_stars') {
+                // Redirect directly to cloned game on port 5174
+                window.location.href = `http://${window.location.hostname}:5174#battle`;
+                return;
+            }
             socket.emit('joinDistrict', target);
             currentDistrict = target;
             mapModal.style.display = 'none';
@@ -318,13 +323,14 @@ socket.on('itemBought', (res) => {
 
 // Battle Setup UI Logic
 const battleModal = document.getElementById('battle-modal');
-const teamSelection = document.getElementById('team-selection');
 const enterBattleBtn = document.getElementById('enter-battle-btn');
+
 const closeBattleBtn = document.getElementById('close-battle-btn');
 const modeRadios = document.querySelectorAll('input[name="mode"]');
 
 function openBattleSetup() {
-    battleModal.style.display = 'flex';
+    // Skip modal and enter Deathmatch directly
+    socket.emit('joinBattle', { mode: 'solo', team: null });
 }
 
 if (closeBattleBtn) {
@@ -333,26 +339,6 @@ if (closeBattleBtn) {
     });
 }
 
-// Toggle team selection based on mode
-modeRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        if (e.target.value === 'team') {
-            teamSelection.style.display = 'block';
-        } else {
-            teamSelection.style.display = 'none';
-        }
-    });
-});
-
-if (enterBattleBtn) {
-    enterBattleBtn.addEventListener('click', () => {
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        const team = mode === 'team' ? document.querySelector('input[name="team"]:checked').value : null;
-
-        socket.emit('joinBattle', { mode, team });
-        battleModal.style.display = 'none';
-    });
-}
 
 // Quiz UI Logic
 const quizModal = document.getElementById('quiz-modal');
@@ -522,6 +508,29 @@ function checkInteractions() {
             }
         }
     }
+
+    // 4. Brawl Stars District Interactions
+    if (currentDistrict === 'brawl_stars') {
+        const me = players[myId];
+        if (!me) return;
+
+        const cx = 400, cy = 300;
+        const dist = Math.sqrt((me.x - cx) ** 2 + (me.y - cy) ** 2);
+
+        if (dist < 100) {
+            promptDiv.style.display = 'block';
+            promptDiv.style.left = cx + 'px';
+            promptDiv.style.top = (cy - 120) + 'px';
+            promptDiv.textContent = "[E] ENTER NEON WAR ARENA";
+
+            if (keys.e) {
+                keys.e = false;
+                // Redirect to the cloned game on Vite port 5174
+                window.location.href = `http://${window.location.hostname}:5174`;
+            }
+        }
+    }
+
 }
 
 // Battle Zone Attack Logic
@@ -545,15 +554,10 @@ function handleAttack() {
             const dx = target.x - me.x;
             const dy = target.y - me.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-
             if (dist < range) {
-                // Check friendly fire
-                if (me.mode === 'team' && me.team === target.team) {
-                    return; // Don't attack teammates
-                }
-
                 socket.emit('playerAttack', { targetId: target.playerId });
             }
+
         });
     }
 }

@@ -27,40 +27,76 @@ let db, usersCol, housesCol, itemsCol;
 
 async function initDB() {
     try {
+        // Set a short timeout for connection
         await client.connect();
         console.log("Connected to MongoDB");
         db = client.db();
         usersCol = db.collection('users');
         housesCol = db.collection('houses');
         itemsCol = db.collection('items');
+    } catch (err) {
+        console.error("MongoDB Connection Error, using in-memory mock:", err);
+        // Mock DB implementation
+        const memoryDB = {
+            users: [],
+            houses: [],
+            items: []
+        };
+        const createMockCol = (name) => ({
+            findOne: async (query) => memoryDB[name].find(doc => Object.keys(query).every(k => doc[k] === query[k])),
+            find: () => ({ toArray: async () => memoryDB[name] }),
+            insertOne: async (doc) => {
+                memoryDB[name].push(doc);
+                return { insertedId: memoryDB[name].length - 1 }; // Mock insertedId
+            },
+            updateOne: async (query, update) => {
+                const doc = memoryDB[name].find(doc => Object.keys(query).every(k => doc[k] === query[k]));
+                if (doc) {
+                    if (update.$set) Object.assign(doc, update.$set);
+                    if (update.$push) {
+                        for (const [k, v] of Object.entries(update.$push)) {
+                            if (!doc[k]) doc[k] = [];
+                            doc[k].push(v);
+                        }
+                    }
+                }
+            },
+            countDocuments: async () => memoryDB[name].length,
+            insertMany: async (docs) => memoryDB[name].push(...docs)
+        });
+        usersCol = createMockCol('users');
+        housesCol = createMockCol('houses');
+        itemsCol = createMockCol('items');
+    }
 
-        // Initial Data Check & Migration
-        const itemsCount = await itemsCol.countDocuments();
-        if (itemsCount === 0) {
-            console.log("Initializing items in MongoDB...");
+    // Initial Data Check & Migration
+    const itemsCount = await itemsCol.countDocuments();
+    if (itemsCount === 0) {
+        console.log("Initializing items...");
+        try {
             const initialItems = JSON.parse(fs.readFileSync(path.join(__dirname, 'initial_data', 'items.json'), 'utf8'));
             await itemsCol.insertMany(initialItems);
-        }
+        } catch (e) { console.error("Could not load initial items", e); }
+    }
 
-        const housesCount = await housesCol.countDocuments();
-        if (housesCount === 0) {
-            console.log("Initializing houses in MongoDB...");
+    const housesCount = await housesCol.countDocuments();
+    if (housesCount === 0) {
+        console.log("Initializing houses...");
+        try {
             const initialHousesObj = JSON.parse(fs.readFileSync(path.join(__dirname, 'initial_data', 'houses.json'), 'utf8'));
             const initialHousesArr = Object.values(initialHousesObj);
             await housesCol.insertMany(initialHousesArr);
-        }
-
-        // We don't necessarily need to pre-populate users, but we could migrate existing ones
-        // if they existed in initial_data/users.json and were not in DB yet.
-    } catch (err) {
-        console.error("MongoDB Connection Error:", err);
+        } catch (e) { console.error("Could not load initial houses", e); }
     }
+
+    // We don't necessarily need to pre-populate users, but we could migrate existing ones
+    // if they existed in initial_data/users.json and were not in DB yet.
 }
 
 // Global variables for active state (Syncing from DB)
 const players = {};
 const socketUserMap = {};
-const DISTRICTS = ['plaza', 'housing', 'arena', 'school', 'arena_battle'];
+const DISTRICTS = ['plaza', 'housing', 'arena', 'school', 'arena_battle', 'brawl_stars'];
 
 initDB().then(() => {
     io.on('connection', (socket) => {
