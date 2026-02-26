@@ -6,6 +6,7 @@ const renderer = new Renderer('game-canvas');
 
 let players = {};
 let myId = null;
+let lastState = 'idle'; // Track state for emission
 
 // Battle Zone Obstacles (matching renderer.js drawBattleZone)
 const BATTLE_OBSTACLES = [
@@ -805,16 +806,24 @@ function update() {
         }
     }
 
-    if (moved) {
+    const newState = moved ? 'walking' : 'idle';
+    player.state = newState;
+
+    if (moved || newState !== lastState) {
         // Throttle updates to ~30ms to avoid flooding socket
         const now = Date.now();
-        if (!player.lastMoveTime || now - player.lastMoveTime > 30) {
-            socket.emit('playerMovement', { x: player.x, y: player.y });
+        if (!player.lastMoveTime || now - player.lastMoveTime > 30 || newState !== lastState) {
+            socket.emit('playerMovement', {
+                x: player.x,
+                y: player.y,
+                state: newState
+            });
             player.lastMoveTime = now;
+            lastState = newState;
         }
 
         // Boundary Checks for Inter-District Travel
-        checkDistrictBoundaries(player);
+        if (moved) checkDistrictBoundaries(player);
     }
 }
 

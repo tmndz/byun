@@ -85,24 +85,40 @@ export class Renderer {
             const dx = player.x - animState.lastX;
             const dy = player.y - animState.lastY;
             const moved = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
+            const isMoving = player.state === 'walking' || moved;
 
-            if (moved) {
+            if (isMoving) {
                 animState.isMoving = true;
                 // Update Direction
                 if (Math.abs(dx) > Math.abs(dy)) {
                     animState.direction = dx > 0 ? 2 : 1; // Right : Left
-                } else {
+                } else if (Math.abs(dy) > 0.1) {
                     animState.direction = dy > 0 ? 0 : 3; // Down : Up
                 }
 
-                // Update Frame
-                if (now - animState.lastUpdate > 150) { // 150ms per frame
+                // Update Frame for walking (150ms)
+                if (now - animState.lastUpdate > 150) {
                     animState.frame = (animState.frame + 1) % 4;
                     animState.lastUpdate = now;
                 }
             } else {
                 animState.isMoving = false;
-                animState.frame = 0; // Idle frame
+
+                // Determine if we should animate frames while idle
+                const sprite = this.sprites.player;
+                const rowCount = (sprite.complete && sprite.naturalHeight !== 0)
+                    ? Math.floor(sprite.height / (sprite.width / 4))
+                    : 3;
+
+                if (rowCount >= 4) {
+                    // Update Frame for idle (slower, 300ms)
+                    if (now - animState.lastUpdate > 300) {
+                        animState.frame = (animState.frame + 1) % 4;
+                        animState.lastUpdate = now;
+                    }
+                } else {
+                    animState.frame = 0; // Use first frame for idle if no dedicated row
+                }
             }
 
             // Update last position for next frame
@@ -114,44 +130,51 @@ export class Renderer {
             if (this.sprites.player.complete && this.sprites.player.naturalHeight !== 0) {
                 const sprite = this.sprites.player;
                 const frameWidth = sprite.width / 4;
-                const frameHeight = sprite.height / 3; // 3 rows now: Down, Side, Up
+                const rowCount = Math.floor(sprite.height / (sprite.width / 4));
+                const frameHeight = sprite.height / rowCount;
 
-                // animState.direction mappings (from main.js): 0: Down, 1: Left, 2: Right, 3: Up
-                // Sprite Sheet Row mappings: 0: Down, 1: Side, 2: Up
                 let row = 0;
                 let flipX = false;
 
-                if (animState.direction === 1) { // Left
-                    row = 1; // Use side row
-                    flipX = true;
-                } else if (animState.direction === 2) { // Right
-                    row = 1; // Use side row
-                } else if (animState.direction === 3) { // Up
-                    row = 2;
-                } else { // Down (0)
-                    row = 0;
+                if (!isMoving && rowCount >= 4) {
+                    row = 3; // Dedicated idle row
+                } else {
+                    if (animState.direction === 1) { // Left
+                        row = 1; // Use side row
+                        flipX = true;
+                    } else if (animState.direction === 2) { // Right
+                        row = 1; // Use side row
+                    } else if (animState.direction === 3) { // Up
+                        row = 2;
+                    } else { // Down (0)
+                        row = 0;
+                    }
                 }
 
                 const col = animState.frame;
 
                 this.ctx.save();
 
-                if (flipX) {
-                    // To flip, we move to the center of the character, scale, and draw relative
-                    this.ctx.translate(player.x, player.y);
-                    this.ctx.scale(-1, 1);
-                    this.ctx.drawImage(
-                        sprite,
-                        col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
-                        -20, -30, 40, 40 // Destination (relative to flipped axis)
-                    );
-                } else {
-                    this.ctx.drawImage(
-                        sprite,
-                        col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
-                        player.x - 20, player.y - 30, 40, 40 // Destination
-                    );
+                // Idle "breathing" effect if no dedicated idle row
+                let scaleY = 1.0;
+                if (!isMoving && rowCount < 4) {
+                    // Subtle pulse
+                    scaleY = 1.0 + Math.sin(now / 200) * 0.05;
                 }
+
+                this.ctx.translate(player.x, player.y);
+                if (flipX) this.ctx.scale(-1, 1);
+
+                // Apply breathing scale if idle
+                if (!isMoving && rowCount < 4) {
+                    this.ctx.scale(1, scaleY);
+                }
+
+                this.ctx.drawImage(
+                    sprite,
+                    col * frameWidth, row * frameHeight, frameWidth, frameHeight, // Source
+                    -20, -30, 40, 40 // Destination (relative to center)
+                );
 
                 this.ctx.restore();
             } else {

@@ -108,7 +108,8 @@ initDB().then(() => {
                 ...userData,
                 playerId: socket.id,
                 hp: 100,
-                maxHp: 100
+                maxHp: 100,
+                state: 'idle'
             };
 
             const district = players[socket.id].district;
@@ -154,6 +155,7 @@ initDB().then(() => {
             if (players[socket.id]) {
                 players[socket.id].x = movementData.x;
                 players[socket.id].y = movementData.y;
+                players[socket.id].state = movementData.state || 'idle';
                 socket.to(players[socket.id].district).emit('playerMoved', players[socket.id]);
             }
         });
