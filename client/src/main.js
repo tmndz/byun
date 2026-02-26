@@ -225,6 +225,11 @@ mapNodes.forEach(node => {
     node.addEventListener('click', () => {
         const target = node.getAttribute('data-target');
         if (target) {
+            if (target === 'brawl_stars') {
+                // Redirect directly to cloned game on port 5174
+                window.location.href = `http://${window.location.hostname}:5174#battle`;
+                return;
+            }
             socket.emit('joinDistrict', target);
             currentDistrict = target;
             mapModal.style.display = 'none';
