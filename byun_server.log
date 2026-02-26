@@ -1,0 +1,47 @@
+
+> byun@1.0.0 start
+> node server/index.js
+
+MongoDB Connection Error, using in-memory mock: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/sdam/topology.js:347:38)
+    at async Topology._connect (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/sdam/topology.js:220:28)
+    at async Topology.connect (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/sdam/topology.js:171:13)
+    at async topologyConnect (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/mongo_client.js:258:17)
+    at async MongoClient._connect (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/mongo_client.js:271:13)
+    at async MongoClient.connect (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/mongo_client.js:196:13)
+    at async initDB (file:///Users/paultanchi/Downloads/byun/server/index.js:31:9) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/paultanchi/Downloads/byun/node_modules/mongodb/lib/cmap/connect.js:297:44)
+      at Object.onceWrapper (node:events:623:26)
+      at Socket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    errorLabelSet: Set(3) { 'SystemOverloadedError', 'RetryableError', 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1134:18)
+        at afterConnectMultiple (node:net:1715:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+Initializing items...
+Initializing houses...
+Server running on port 3000
