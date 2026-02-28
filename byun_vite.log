@@ -4,3 +4,8 @@
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
 5:17:41 PM [vite] page reload index.html
+9:57:01 AM [vite] vite.config.js changed, restarting server...
+9:57:01 AM [vite] server restarted.
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.23:5173/
