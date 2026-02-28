@@ -88,7 +88,6 @@ export class Renderer {
             const isMoving = player.state === 'walking' || moved;
 
             if (isMoving) {
-                animState.isMoving = true;
                 // Update Direction
                 if (Math.abs(dx) > Math.abs(dy)) {
                     animState.direction = dx > 0 ? 2 : 1; // Right : Left
@@ -96,12 +95,24 @@ export class Renderer {
                     animState.direction = dy > 0 ? 0 : 3; // Down : Up
                 }
 
+                // Just started moving? Reset timer/frame
+                if (!animState.isMoving) {
+                    animState.frame = 0;
+                    animState.lastUpdate = now;
+                }
+                animState.isMoving = true;
+
                 // Update Frame for walking (150ms)
                 if (now - animState.lastUpdate > 150) {
                     animState.frame = (animState.frame + 1) % 4;
                     animState.lastUpdate = now;
                 }
             } else {
+                // Just stopped? Reset timer/frame to start idle animation cleanly
+                if (animState.isMoving) {
+                    animState.frame = 0;
+                    animState.lastUpdate = now;
+                }
                 animState.isMoving = false;
 
                 // Determine if we should animate frames while idle
