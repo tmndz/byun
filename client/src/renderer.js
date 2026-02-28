@@ -328,9 +328,9 @@ export class Renderer {
         this.ctx.fillStyle = 'white';
         this.ctx.font = 'bold 30px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText("NEON WAR ARENA", cx, cy - 20);
+        this.ctx.fillText("BRAWL STARS ARENA", cx, cy - 20);
         this.ctx.font = '16px Arial';
-        this.ctx.fillText("Touch to start Deathmatch", cx, cy + 20);
+        this.ctx.fillText("Touch to start Battle", cx, cy + 20);
     }
 
 

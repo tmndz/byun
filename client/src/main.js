@@ -226,11 +226,8 @@ mapNodes.forEach(node => {
         const target = node.getAttribute('data-target');
         if (target) {
             if (target === 'brawl_stars') {
-                // Redirect directly to cloned game on port 5174
-                // Use current hostname and protocol for robustness
-                const targetUrl = `${window.location.protocol}//${window.location.hostname}:5174${window.location.pathname}#battle`;
-                console.log("Redirecting to Neon War Arena:", targetUrl);
-                window.location.href = targetUrl;
+                // Instead of redirecting, join battle arena directly
+                socket.emit('joinBattle', { mode: 'solo', team: null });
                 return;
             }
             socket.emit('joinDistrict', target);
@@ -528,10 +525,8 @@ function checkInteractions() {
 
             if (keys.e) {
                 keys.e = false;
-                // Redirect to the cloned game on Vite port 5174
-                const targetUrl = `${window.location.protocol}//${window.location.hostname}:5174${window.location.pathname}#battle`;
-                console.log("Redirecting to Neon War Arena:", targetUrl);
-                window.location.href = targetUrl;
+                // Instead of redirecting, join battle arena directly
+                socket.emit('joinBattle', { mode: 'solo', team: null });
             }
         }
     }
