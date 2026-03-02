@@ -1,0 +1,10 @@
+
+  VITE v5.4.21  ready in 139 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: use --host to expose
+9:57:03 AM [vite] vite.config.js changed, restarting server...
+9:57:03 AM [vite] server restarted.
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://192.168.1.23:5174/

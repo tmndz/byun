@@ -1,0 +1,5 @@
+# Ignore downloaded assets to let user provide their own or to avoid clutter
+client/public/sprites/*
+client/public/audio/*
+!client/public/sprites/.keep
+!client/public/audio/.keep

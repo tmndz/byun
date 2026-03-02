@@ -1,0 +1,32 @@
+[
+    {
+        "id": "sword",
+        "name": "Iron Sword",
+        "type": "melee",
+        "damage": 100,
+        "range": 50,
+        "cooldown": 700,
+        "price": 100,
+        "color": "#C0C0C0"
+    },
+    {
+        "id": "gun",
+        "name": "Blaster",
+        "type": "ranged",
+        "damage": 15,
+        "range": 250,
+        "cooldown": 600,
+        "price": 250,
+        "color": "#FF4500"
+    },
+    {
+        "id": "hp",
+        "name": "Healer",
+        "type": "near",
+        "damage": -100,
+        "range": 25,
+        "cooldown": 800,
+        "price": 300,
+        "color": "#F71735"
+    }
+]

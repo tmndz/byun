@@ -6,10 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "concurrently \"nodemon server/index.js\" \"vite\" \"cd brawl-stars && npm run dev\"",
+    "dev": "concurrently \"nodemon server/index.js\" \"vite\"",
+    "build": "vite build",
     "server": "nodemon server/index.js",
-    "client": "vite",
-    "brawl": "cd brawl-stars && npm run dev"
+    "client": "vite"
   },
   "keywords": [],
   "author": "",

@@ -86,6 +86,12 @@ socket.on('loginSuccess', (data) => {
 
     // Update local district to match server
     currentDistrict = data.district;
+
+    // Check for #battle hash to go straight to combat
+    if (window.location.hash === '#battle') {
+        console.log("Auto-entering battle arena...");
+        socket.emit('joinBattle', { mode: 'solo', team: null });
+    }
 });
 
 socket.on('updateMoney', (amount) => {
@@ -225,13 +231,6 @@ mapNodes.forEach(node => {
     node.addEventListener('click', () => {
         const target = node.getAttribute('data-target');
         if (target) {
-            if (target === 'brawl_stars') {
-                // Redirect directly to the nested Brawl Stars game on port 5174
-                const targetUrl = `${window.location.protocol}//${window.location.hostname}:5174${window.location.pathname}#battle`;
-                console.log("Traveling to Brawl Stars Arena:", targetUrl);
-                window.location.href = targetUrl;
-                return;
-            }
             socket.emit('joinDistrict', target);
             currentDistrict = target;
             mapModal.style.display = 'none';
@@ -523,14 +522,12 @@ function checkInteractions() {
             promptDiv.style.display = 'block';
             promptDiv.style.left = cx + 'px';
             promptDiv.style.top = (cy - 120) + 'px';
-            promptDiv.textContent = "[E] ENTER NEON WAR ARENA";
+            promptDiv.textContent = "[E] ENTER BATTLE (DEATHMATCH)";
 
             if (keys.e) {
                 keys.e = false;
-                // Redirect directly to the nested Brawl Stars game on port 5174
-                const targetUrl = `${window.location.protocol}//${window.location.hostname}:5174${window.location.pathname}#battle`;
-                console.log("Entering Brawl Stars Arena:", targetUrl);
-                window.location.href = targetUrl;
+                // Instead of broken redirect, join Deathmatch battle
+                socket.emit('joinBattle', { mode: 'solo', team: null });
             }
         }
     }
